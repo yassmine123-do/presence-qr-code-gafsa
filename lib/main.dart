@@ -1,122 +1,354 @@
-import 'package:material_ui/material_ui.dart';
-
+import 'package:flutter/material.dart';
 void main() {
-  runApp(const MyApp());
+  runApp(const PresenceApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class PresenceApp extends StatelessWidget {
+  const PresenceApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title:'Présence QR Gafsa',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        useMaterial3: true,
+        colorScheme:ColorScheme.fromSeed(seedColor: const Color(0xFF0875D1),) ,
+        fontFamily: 'Roboto',),
+      home: const LoginScreen(),
+
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController=TextEditingController();
+  final passwordController=TextEditingController();
+  bool obscurePassword=true;
+  bool isStudent=true;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+ 
 
   @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+  void dispose(){
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+  void login(){
+    if(emailController.text.trim().isEmpty||passwordController.text.isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('veuillez remplir tous les champs '),
         ),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content:Text('interface préte pour la connexion internet'),
+
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      );
+  }
+  @override
+
+  Widget build(BuildContext context) {
+    
+    return Scaffold(
+      body:Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end:Alignment.bottomRight,
+            colors: [
+                Color(0xFFEAF7FF),
+              Colors.white,
+              Color(0xFFD5ECFF),
+            ],
+            ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 25,
+              vertical: 20,
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height:15),
+                //LOGO ISAEG
+                Image.asset('assets/isaeg_logo.jpg',
+                height: 135,
+                fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 18),
+                const Text('Gestion des présence ',
+                 textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF103A78),
+                    ),
+
+                ),
+                const Text('par Qr code',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Color(0xFF0875D1),
+                  ),
+
+                ),
+                const SizedBox(height: 15),
+                const Icon( 
+                  Icons.qr_code_scanner,
+                  size: 65,
+                  color: Color(0xFF079DE5),
+                
+                ),
+                const SizedBox(height: 25),
+                //formulaire
+                Container(
+                  padding:const EdgeInsets.all(0),
+                  decoration:BoxDecoration(
+                    color:Colors.transparent, 
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withValues(alpha: 0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child:Column(
+                    children: [
+                    TextField(
+                      controller: emailController,
+                      keyboardType:TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Adresse e-mail',
+                        prefixIcon: const Icon(Icons.email_outlined),
+                        border:OutlineInputBorder(borderRadius: BorderRadius.circular(18),
+                        ),
+
+                      ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller:passwordController ,
+                        obscureText: obscurePassword,
+                        decoration: InputDecoration(
+                          labelText: 'Mot de Passe',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                             icon: Icon(
+                              obscurePassword?Icons.visibility_off:Icons.visibility,
+
+                             ),
+                             onPressed: () {
+                               setState(() {
+                                 obscurePassword= !obscurePassword;
+                               });
+                             },
+                             ),
+                             border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                             ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: (){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Récupération du mot de passe à connecter',
+                            ),
+                            ),
+                          );
+                        },
+                        child: const Text('Mot de passe oublié ?'),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      //connexion
+                      SizedBox(
+                         width: double.infinity,
+                        height: 58,
+                        child: ElevatedButton.icon(
+                          onPressed: login,
+                          icon: const Icon(Icons.login),
+                          label: const Text(
+                            'se connecter',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                           style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF103A78),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+
+                      ),
+                      ),
+                      const SizedBox(height: 22),
+                      const Row(
+                        children: [
+                          Expanded(child:Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: Text('ou'),
+                          ),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      //creer compte
+                      SizedBox(
+                        width: double.infinity,
+                        height: 55,
+                        child: OutlinedButton.icon(onPressed: (){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Page de création de compte a realisé',
+                              ),
+                              ),
+                          );
+                        },
+                        icon: const Icon(Icons.person_add_alt_1),
+                        label: const Text(
+                          'créer un compte',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                         foregroundColor: const Color(0xFF103A78),
+                         side: const BorderSide(color: Color(0xFF103A78),
+                         width: 1.5,
+                         ),
+                         shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                           ),
+                        ),
+                      ),
+                      ),
+                      const SizedBox(height: 25),
+                      const Text('connectez-vous en tant que:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color:  Color(0xFF103A78),
+                      ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: roleCard(
+                              'Étudiant',
+                              Icons.school,
+                              true,
+                            ),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: roleCard(
+                                'Enseignant',
+                                Icons.co_present,
+                                false,
+                              ),
+                              ),
+
+                        ],
+                        ),
+                    ],
+                  ),
+                  ),
+                  const SizedBox(height: 25),
+                  const Text('Présence QR Gafsa © 2026',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF103A78),
+                  ),
+                  ),
+
+
+
+              ],
+            ),
+          ),
+          ),
       ),
     );
   }
+ Widget roleCard(String title, IconData iconData, bool student){
+    final selected = isStudent == student;
+    return GestureDetector(
+      onTap: (){
+        setState(() {
+          isStudent=student;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 125,
+        decoration: BoxDecoration(
+          color: selected ?const Color(0xFFD9F0FF)
+              : const Color(0xFFF7FAFF),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: selected
+                ? const Color(0xFF0875D1)
+                : const Color(0xFFE0E7F0),
+            width: selected ? 2 : 1,
+          ),
+          ),
+          child:Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+  iconData,
+  size: 42,
+  color: const Color(0xFF103A78),
+),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF103A78),
+                ),
+                ),
+                 if (selected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF0875D1),
+                size: 19,
+              ),
+            ],
+          ),
+        ),
+    );
+  }
+
+
 }
