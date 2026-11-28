@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   bool obscurePassword = true;
   bool isStudent = true;
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -49,19 +52,120 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void login() {
+  Future<void> login() async{
     if (emailController.text.trim().isEmpty ||
         passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('veuillez remplir tous les champs ')),
+        const SnackBar
+          (content: Text('veuillez remplir tous les champs '),
+          ),
       );
       return;
+
     }
+    setState(() {
+      isLoading = true;
+
+    });
+    try{
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword
+      (email: emailController.text.trim(),
+       password: passwordController.text,
+       );
+       final user = credential.user;
+       if(user == null){
+        throw Exception('utilisateur introuvable');
+       }
+       //récupérer le profil dans firestore
+       final userDoc = await FirebaseFirestore.instance.collection('users')
+       .doc(user.uid)
+       .get();
+       //vérifier si le profil existe
+       if (!userDoc.exists){
+        await FirebaseAuth.instance.signOut();
+        if (!mounted) return;
+         ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Profil utilisateur introuvable'),
+    ),
+  );
+  return;
+
+
+
+       }
+       final userData = userDoc.data()!;
+       final roleFirestore = userData['role'];
+       final actif = userData['actif'] == true;
+       final roleChoisi = isStudent ? 'etudiant' : 'enseignant';
+
+       // vérifier si le compte est actif
+       if(!actif){
+        await FirebaseAuth.instance.signOut();
+        if (!mounted) return;
+         ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('votre compte est désactivé'),
+    ),
+  );
+  return;
+       }
+       //vérifier le role sélectionner
+       if (roleFirestore != roleChoisi){
+        await FirebaseAuth.instance.signOut();
+        if (!mounted) return;
+         ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Le role selectionné ne correspond pas au compte'),
+    ),
+  );
+  return;
+
+       }
+       if (!mounted) return;
+         ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Connexion réussie : $roleFirestore'),
+    ),
+  );
+      
+    
+    } 
+    on FirebaseAuthException catch (e){
+      String message = 'Erreur de connexion';
+      if (e.code == 'user-not-found'){
+        message= 'Aucun compte trouvé avec cet e-mail';
+      }
+      else if (e.code == 'wrong-password' ||
+    e.code == 'invalid-credential') {
+  message = 'E-mail ou mot de passe incorrect';
+} else if (e.code == 'network-request-failed') {
+  message = 'Vérifiez votre connexion Internet';
+}
+      if(!mounted) return;
+    
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('interface préte pour la connexion internet'),
+      SnackBar(
+        content: Text(message),
       ),
     );
+  } catch(e) {
+    debugPrint('ERREUR CONNEXION : $e');
+    if(!mounted) return;
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(
+        content: Text('Erreur : $e'),
+        duration: const Duration(seconds: 8),
+        ),
+    );
+  } finally {
+    if (mounted){
+      setState(() {
+        isLoading=false;
+      });
+    }
+  }
   }
 
   @override
